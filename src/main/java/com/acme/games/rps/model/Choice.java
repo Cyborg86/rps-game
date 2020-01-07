@@ -1,5 +1,7 @@
 package com.acme.games.rps.model;
 
+import java.util.Objects;
+
 public enum Choice {
     ROCK {
         @Override
@@ -23,6 +25,7 @@ public enum Choice {
     };
 
     public MoveResult evaluateVs(Choice other) {
+        Objects.requireNonNull(other);
         if (other == this) {
             return MoveResult.DRAW;
         } else if (other == this.beats()) {
