@@ -4,6 +4,7 @@ import com.acme.games.rps.model.Choice;
 import com.acme.games.rps.model.Game;
 import com.acme.games.rps.service.GameService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -17,7 +18,8 @@ public class GameController {
     private final GameService gameService;
 
     @PostMapping
-    public ResponseEntity<Void> startGame() {
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<Void> createGame() {
         Game game = gameService.createGame();
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
@@ -30,9 +32,9 @@ public class GameController {
         return gameService.getGame(id);
     }
 
-    @PutMapping("/{id}/finish")
-    public void finishGame(@PathVariable String id) {
-        gameService.finishGame(id);
+    @PostMapping("/{id}/finish")
+    public Game finishGame(@PathVariable String id) {
+        return gameService.finishGame(id);
     }
 
     @PostMapping("/{id}/moves")
