@@ -2,10 +2,7 @@ package com.acme.games.rps.service;
 
 import com.acme.games.rps.dao.GameDao;
 import com.acme.games.rps.exception.GameNotFoundException;
-import com.acme.games.rps.model.Choice;
-import com.acme.games.rps.model.Game;
-import com.acme.games.rps.model.GameStatus;
-import com.acme.games.rps.model.Move;
+import com.acme.games.rps.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +13,6 @@ import java.util.UUID;
 public class GameService {
     private final GameDao gameDao;
     private final ChoiceService choiceService;
-    private final MoveService moveService;
 
     public Game createGame() {
         String id = UUID.randomUUID().toString();
@@ -40,8 +36,9 @@ public class GameService {
         Game game = getGame(gameId);
         //TODO: add finalized game check
 
-        Choice ourChoice = choiceService.makeChoice(game, playerChoice);
-        Move move = moveService.evaluateMove(playerChoice, ourChoice);
+        Choice serverChoice = choiceService.makeChoice(game, playerChoice);
+        MoveResult result = playerChoice.evaluateVs(serverChoice);
+        Move move = new Move(playerChoice, serverChoice, result);
 
         game.addMove(move);
         gameDao.save(game);

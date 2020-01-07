@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class Move {
-    private final Choice playerOneChoice;
-    private final Choice playerTwoChoice;
+    private final Choice playerChoice;
+    private final Choice serverChoice;
     private final MoveResult result;
 }
