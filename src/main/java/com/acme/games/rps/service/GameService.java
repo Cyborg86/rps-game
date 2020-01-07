@@ -1,12 +1,15 @@
 package com.acme.games.rps.service;
 
 import com.acme.games.rps.dao.GameDao;
+import com.acme.games.rps.exception.GameAlreadyFinishedException;
 import com.acme.games.rps.exception.GameNotFoundException;
 import com.acme.games.rps.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
+
+import static java.lang.String.format;
 
 @Service
 @RequiredArgsConstructor
@@ -29,12 +32,14 @@ public class GameService {
 
     public Game getGame(String id) {
         return gameDao.findById(id)
-                .orElseThrow(() -> new GameNotFoundException(id));
+                .orElseThrow(() -> new GameNotFoundException(format("Game Id=%s not found", id)));
     }
 
     public Game makeMove(String gameId, Choice playerChoice) {
         Game game = getGame(gameId);
-        //TODO: add finalized game check
+        if (game.getStatus() == GameStatus.FINISHED) {
+            throw new GameAlreadyFinishedException(format("Game Id=%s is already finished", gameId));
+        }
 
         Choice serverChoice = choiceService.makeChoice(game, playerChoice);
         MoveResult result = playerChoice.evaluateVs(serverChoice);

@@ -1,6 +1,6 @@
 package com.acme.games.rps.exception;
 
-public class GameNotFoundException extends RuntimeException {
+public class GameNotFoundException extends RpsGameException {
     public GameNotFoundException() {
     }
 
