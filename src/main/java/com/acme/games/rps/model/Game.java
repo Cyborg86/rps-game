@@ -16,4 +16,17 @@ public class Game {
     public void addMove(Move move) {
         moves.add(move);
     }
+
+    public GameStatistics getStatistics() {
+        long total = moves.size();
+        long wins = getCount(MoveResult.WIN);
+        long draws = getCount(MoveResult.DRAW);
+        long looses = getCount(MoveResult.LOOSE);
+
+        return new GameStatistics(total, wins, draws, looses);
+    }
+
+    private long getCount(MoveResult result) {
+        return moves.stream().filter(m -> m.getResult() == result).count();
+    }
 }

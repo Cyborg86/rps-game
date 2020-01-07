@@ -19,12 +19,12 @@ public class GameController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> createGame() {
+    public ResponseEntity<Game> createGame() {
         Game game = gameService.createGame();
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(game.getId()).toUri();
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(game);
     }
 
     @GetMapping("/{id}")
