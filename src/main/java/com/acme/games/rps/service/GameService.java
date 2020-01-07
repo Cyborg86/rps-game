@@ -5,6 +5,7 @@ import com.acme.games.rps.exception.GameAlreadyFinishedException;
 import com.acme.games.rps.exception.GameNotFoundException;
 import com.acme.games.rps.model.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -12,30 +13,42 @@ import java.util.UUID;
 import static java.lang.String.format;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class GameService {
     private final GameDao gameDao;
     private final ChoiceService choiceService;
 
     public Game createGame() {
+        log.debug("Creating a new game...");
         String id = UUID.randomUUID().toString();
         Game game = new Game(id);
 
-        return gameDao.save(game);
+        Game saved = gameDao.save(game);
+
+        log.debug("Game Id={} created", id);
+        return saved;
     }
 
     public Game finishGame(String id) {
+        log.debug("Finishing game Id={}", id);
         Game game = getGame(id);
         game.setStatus(GameStatus.FINISHED);
-        return gameDao.save(game);
+        Game saved = gameDao.save(game);
+
+        log.debug("Game Id={} finished", id);
+        return saved;
     }
 
     public Game getGame(String id) {
+        log.debug("Searching for game Id={}", id);
         return gameDao.findById(id)
                 .orElseThrow(() -> new GameNotFoundException(format("Game Id=%s not found", id)));
     }
 
     public Game makeMove(String gameId, Choice playerChoice) {
+        log.debug("Player made a move in game Id={}. Player choice is {}", gameId, playerChoice);
+
         Game game = getGame(gameId);
         if (game.getStatus() == GameStatus.FINISHED) {
             throw new GameAlreadyFinishedException(format("Game Id=%s is already finished", gameId));
@@ -46,8 +59,8 @@ public class GameService {
         Move move = new Move(playerChoice, serverChoice, result);
 
         game.addMove(move);
-        gameDao.save(game);
-
-        return game;
+        Game saved = gameDao.save(game);
+        log.debug("A new move in game Id={}:  {}", gameId, move);
+        return saved;
     }
 }
