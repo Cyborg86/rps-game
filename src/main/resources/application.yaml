@@ -1,7 +1,13 @@
+server:
+  port: 8080
+  servlet.context-path: "/"
+
 #Choice service selector: possible values are
 # - "markov" for Markov Chain based logic
 # - "random" for pure random based logic
 choice.service: markov
+
+spring.data.mongodb.uri: "mongodb://localhost:27017/rps_game"
 
 logging:
   level:
