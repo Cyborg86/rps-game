@@ -1,7 +1,9 @@
 package com.acme.games.rps.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +14,10 @@ public class Game {
     private final String id;
     private List<Move> moves = new ArrayList<>();
     private GameStatus status = GameStatus.IN_PROGRESS;
+
+    @JsonIgnore
+    @Version
+    private Long version;
 
     public void addMove(Move move) {
         moves.add(move);
