@@ -1,4 +1,4 @@
-package com.acme.games.rps.service;
+package com.acme.games.rps.service.impl;
 
 import com.acme.games.rps.dao.GameDao;
 import com.acme.games.rps.exception.GameAlreadyFinishedException;
@@ -18,26 +18,24 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.acme.games.rps.model.Choice.*;
-import static com.acme.games.rps.model.MoveResult.WIN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class GameServiceTest {
+class GameServiceImplTest {
 
-    GameService gameService;
+    GameServiceImpl gameService;
 
     @Mock
     GameDao gameDao;
 
     @Mock
-    ChoiceService choiceService;
+    RandomChoiceServiceImpl choiceService;
 
     @BeforeEach
     void setUp() {
-        gameService = new GameService(gameDao, choiceService);
+        gameService = new GameServiceImpl(gameDao, choiceService);
     }
 
     @Test
@@ -76,9 +74,9 @@ class GameServiceTest {
     @Test
     void shouldMakeMoves() {
         String gameId = UUID.randomUUID().toString();
-        Choice playerChoice = SCISSORS;
-        Choice serverChoice = ROCK;
-        ImmutableList<Move> existingMoves = ImmutableList.of(new Move(ROCK, PAPER, WIN));
+        Choice playerChoice = Choice.random();
+        Choice serverChoice = Choice.random();
+        ImmutableList<Move> existingMoves = ImmutableList.of(new Move(Choice.random(), Choice.random()));
         Game existingGame = new Game(gameId);
         existingMoves.forEach(existingGame::addMove);
         when(gameDao.findById(gameId)).thenReturn(Optional.of(existingGame));
@@ -87,7 +85,7 @@ class GameServiceTest {
 
         Game updatedGame = gameService.makeMove(gameId, playerChoice);
 
-        Move expectedMove = new Move(playerChoice, serverChoice, playerChoice.evaluateVs(serverChoice));
+        Move expectedMove = new Move(playerChoice, serverChoice);
         List<Move> expectedMoves = ImmutableList.<Move>builder().addAll(existingMoves).add(expectedMove).build();
         assertThat(updatedGame.getId()).isEqualTo(gameId);
         assertThat(updatedGame.getMoves()).containsExactlyElementsOf(expectedMoves);
@@ -97,12 +95,11 @@ class GameServiceTest {
     @Test
     void shouldFailToMakeMovesOnFinishedGame() {
         String gameId = UUID.randomUUID().toString();
-        Choice playerChoice = SCISSORS;
         Game existingGame = new Game(gameId);
         existingGame.setStatus(GameStatus.FINISHED);
         when(gameDao.findById(gameId)).thenReturn(Optional.of(existingGame));
 
-        Throwable captured = catchThrowable(() -> gameService.makeMove(gameId, playerChoice));
+        Throwable captured = catchThrowable(() -> gameService.makeMove(gameId, Choice.random()));
 
         assertThat(captured).isInstanceOf(GameAlreadyFinishedException.class);
     }

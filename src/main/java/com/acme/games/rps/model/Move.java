@@ -6,5 +6,8 @@ import lombok.Data;
 public class Move {
     private final Choice playerChoice;
     private final Choice serverChoice;
-    private final MoveResult result;
+
+    public MoveResult getResult() {
+        return playerChoice.evaluateVs(serverChoice);
+    }
 }
