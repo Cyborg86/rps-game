@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-import static java.lang.String.format;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -43,7 +41,7 @@ public class GameService {
     public Game getGame(String id) {
         log.debug("Searching for game Id={}", id);
         return gameDao.findById(id)
-                .orElseThrow(() -> new GameNotFoundException(format("Game Id=%s not found", id)));
+                .orElseThrow(() -> new GameNotFoundException(id));
     }
 
     public Game makeMove(String gameId, Choice playerChoice) {
@@ -51,7 +49,7 @@ public class GameService {
 
         Game game = getGame(gameId);
         if (game.getStatus() == GameStatus.FINISHED) {
-            throw new GameAlreadyFinishedException(format("Game Id=%s is already finished", gameId));
+            throw new GameAlreadyFinishedException(gameId);
         }
 
         Choice serverChoice = choiceService.makeChoice(game, playerChoice);

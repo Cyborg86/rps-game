@@ -1,18 +1,9 @@
 package com.acme.games.rps.exception;
 
+import static java.lang.String.format;
+
 public class GameNotFoundException extends RpsGameException {
-    public GameNotFoundException() {
-    }
-
-    public GameNotFoundException(String message) {
-        super(message);
-    }
-
-    public GameNotFoundException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public GameNotFoundException(Throwable cause) {
-        super(cause);
+    public GameNotFoundException(String id) {
+        super(format("Game Id=%s not found", id));
     }
 }
